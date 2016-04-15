@@ -2,9 +2,115 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="no">
+    <meta name = "viewport" content = "initial-scale = 1, user-scalable = no">
+    <title>Shopping List</title>
+    <link rel="stylesheet" href="mdl/material.css">
+    <link rel="stylesheet" href="mdl/dialog-polyfill.css">
+    <link rel="stylesheet" href="style.css">
   </head>
-  <body>
+  <body id="shoppinglist">
 
+    <dialog class="mdl-dialog" id="qr-dialog">
+      <div class="mdl-dialog__content">
+        <p>
+          <div id="qrcode"></div>
+        </p>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close" id="qr-cancel-dialog">Luk</button>
+      </div>
+    </dialog>
+
+    <div class="demo-card-wide mdl-card">
+		  <div id="recipeimage" class="mdl-card__title mdl-shadow--2dp" >
+		    <h2 class="mdl-card__title-text" id="recipename">Flodekartofler</h2>
+		  </div>
+		  <div class="mdl-card__supporting-text">
+
+        <div class="mdl-grid" style="margin: 0; padding:0;">
+          <div class="mdl-cell mdl-cell--12-col">
+            <ul class="demo-list-one mdl-list shopping-list">
+
+            </ul>
+          </div>
+        </div>
+
+		  </div>
+
+		</div>
+
+    <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="fab">
+      <i class="material-icons">compare_arrows</i>
+    </button>
+
+
+
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script src="mdl/material.min.js"></script>
+    <script src="mdl/dialog-polyfill.js"></script>
+    <script src="functions.js"></script>
+    <script type="text/javascript" src="qrcode.min.js"></script>
+    <script type="text/javascript">
+
+      var qrDialog = document.querySelector('#qr-dialog');
+      dialogPolyfill.registerDialog(qrDialog);
+
+      var recipeID = getUrlVars()['recipe'];
+      var qr = getUrlVars()['qr'];
+
+      var qrcode = new QRCode(document.getElementById("qrcode"), {
+        width : 200,
+        height : 200
+      });
+
+      $('#fab').hide();
+      if(qr == 'true'){
+        $('#fab').show();
+      }
+
+      $.get('/recipes/'+recipeID, function(data){
+        $('#recipename').html(data.name);
+    		$('#recipeimage').attr("style", "background: url('"+data.image+"') center / cover;");
+
+        for (var i = 0; i < data.ingredients.length; i++) {
+
+          $('.shopping-list').append('<li class="mdl-list__item mdl-list__item--one-line">\
+            <span class="mdl-list__item-primary-content shopping-list-item">\
+              <span>'+data.ingredients[i].name+'</span>\
+            </span>\
+            <span class="mdl-list__item-secondary-content">\
+            <a class="mdl-list__item-secondary-action"><i class="material-icons">check_box_outline_blank</i></a>\
+            </span></li>');
+        }
+
+        $('.shopping-list li').click(function(){
+
+          if($(this).hasClass('done')){
+            $(this).removeClass('done');
+            $(this).removeAttr('style');
+            $(this).children('span').children('a').html('<i class="material-icons">check_box_outline_blank</i>');
+            $('.shopping-list').prepend($(this));
+          }else{
+            $(this).css('color', '#ccc');
+            $(this).addClass('done');
+            $(this).children('span').children('a').html('<i class="material-icons">check_box</i>');
+            $('.shopping-list').append($(this));
+          }
+        });
+
+      });
+
+      $('#fab').click(function() {
+        qrcode.makeCode('/shoppinglist.html?recipe='+recipeID);
+        qrDialog.showModal();
+      });
+
+      $('#qr-cancel-dialog').click(function() {
+        qrDialog.close();
+      });
+
+    </script>
   </body>
 </html>

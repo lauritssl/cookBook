@@ -57,3 +57,49 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+.mdl-data-table{
+  width: 100%;
+}
+
+.admin-content{
+  padding: 20px;
+}
+
+.mdl-button--accent.mdl-button--accent.mdl-button--raised{
+  background-color: #EA3260;
+}
+
+.mdl-button--colored.mdl-button--colored.mdl-button--raised, .mdl-button--raised.mdl-button--colored{
+  background: #56BB4B;
+}
+
+#fab{
+  background: #56BB4B;
+  position: absolute;
+  top: 225px;
+  right: 30px;
+  z-index: 999;
+}
+
+a{
+  color: #56BB4B;
+}
+
+li{
+  text-transform: capitalize;
+}
+
+.demo-card-square .mdl-card__title-text{
+  position: relative;
+}
+
+.demo-card-square.mdl-card {
+  width: 320px;
+  height: 320px;
+}
+.demo-card-square > .mdl-card__title {
+  color: #fff;
+  background:
+    url('../assets/demos/dog.png') bottom right 15% no-repeat #46B6AC;
+}

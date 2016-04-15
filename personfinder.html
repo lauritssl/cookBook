@@ -42,7 +42,7 @@
 	});
 	$.get( "recipes/"+recipeid, function( data ) {
 		$('#recipename').html(data.name);
-		$('#recipeimage').css("background", "url('"+data.image+"') center / cover;");
+		$('#recipeimage').attr("style", "background: url('"+data.image+"') center / cover;");
 
 	});
 

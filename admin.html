@@ -2,9 +2,175 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title></title>
+		<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="no">
+    <meta name = "viewport" content = "initial-scale = 1, user-scalable = no">
+    <title>Admin</title>
+    <link rel="stylesheet" href="mdl/material.css">
+    <link rel="stylesheet" href="mdl/dialog-polyfill.css">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
+    <div class="admin-content">
 
+      <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="add-shopper-btn">Add shopper</button>
+
+      <br /><br />
+
+      <dialog class="mdl-dialog" id="add-dialog">
+        <h4 class="mdl-dialog__title">Add user and recipe</h4>
+        <div class="mdl-dialog__content">
+          <p>
+            <select class="" name="" id="name-input">
+            </select>
+            <select class="" name="" id="recipe-input">
+            </select>
+          </p>
+        </div>
+        <div class="mdl-dialog__actions">
+          <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="add-btn">Add</button>
+          <button type="button" class="mdl-button close" id="cancel-dialog">Cancel</button>
+        </div>
+      </dialog>
+
+      <dialog class="mdl-dialog" id="qr-dialog">
+        <div class="mdl-dialog__content">
+          <p>
+            <div id="qrcode"></div>
+          </p>
+        </div>
+        <div class="mdl-dialog__actions">
+          <button type="button" class="mdl-button close" id="qr-cancel-dialog">Cancel</button>
+        </div>
+      </dialog>
+
+      <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp" id="shopper-table">
+        <thead>
+          <tr>
+            <th class="mdl-data-table__cell--non-numeric">Recipe</th>
+            <th class="mdl-data-table__cell--non-numeric">Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script src="mdl/material.min.js"></script>
+    <script src="mdl/dialog-polyfill.js"></script>
+    <script type="text/javascript" src="qrcode.min.js"></script>
+    <script type="text/javascript">
+      var addDialog = document.querySelector('#add-dialog');
+      var qrDialog = document.querySelector('#qr-dialog');
+      dialogPolyfill.registerDialog(addDialog);
+      dialogPolyfill.registerDialog(qrDialog);
+
+      var qrcode = new QRCode(document.getElementById("qrcode"), {
+      	width : 200,
+      	height : 200
+      });
+
+      $('#add-shopper-btn').click(function() {
+        addDialog.showModal();
+      });
+
+      $.get('/users', function(data){
+          for (var i = 0; i < data.length; i++) {
+            $('#name-input').append('<option value="'+data[i]._id+'">'+data[i].name+'</option>');
+          }
+      });
+
+      $.get('/recipes', function(data){
+          for (var i = 0; i < data.length; i++) {
+            $('#recipe-input').append('<option value="'+data[i]._id+'">'+data[i].name+'</option>');
+          }
+      });
+
+      $.get('/shoppers', function(data){
+        for (var i = 0; i < data.length; i++) {
+          addShopper(data[i].user, data[i].recipe, data[i]._id);
+        }
+
+      });
+
+      function addShopper(user, recipe, id){
+        $.get('/users/'+user, function(userData){
+
+          $.get('/recipes/'+recipe, function(recipeData){
+            $('#shopper-table tbody').append('<tr id="'+id+'"><td class="mdl-data-table__cell--non-numeric">'+recipeData.name+'</td>\
+              <td class="mdl-data-table__cell--non-numeric">'+userData.name+'</td><td>\
+              <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" href="/shoppinglist.html?qr=true&recipe='+recipeData._id+'">List</a>\
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect qr-btn">QR</button>\
+                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" href="/personfinder.html?user='+userData._id+'&recipe='+recipeData._id+'">Link</a>\
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent delete-btn">Delete</button>\
+              </td></tr>');
+
+              $('.delete-btn').click(function() {
+                deleteElement(this);
+              });
+              $('.qr-btn').click(function() {
+
+                qrcode.makeCode($(this).next('a').attr('href'));
+                qrDialog.showModal();
+              });
+
+          });
+
+        });
+      }
+
+      $('#add-btn').click(function() {
+
+        var name = $('#name-input option:selected').text();
+        var recipe = $('#recipe-input option:selected').text();
+        var userID = $('#name-input').val();
+        var recipeID = $('#recipe-input').val();
+
+        console.log('/shoppers/'+userID+'/'+recipeID);
+
+        $.post('/shoppers/'+userID+'/'+recipeID, function(data){
+          console.log(data);
+          $('#shopper-table tbody').append('<tr id="'+data._id+'"><td class="mdl-data-table__cell--non-numeric">'+recipe+'</td>\
+            <td class="mdl-data-table__cell--non-numeric">'+name+'</td><td>\
+              <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" href="/shoppinglist.html?qr=true&recipe='+recipeID+'">List</a>\
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect qr-btn">QR</button>\
+              <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" href="/personfinder.html?user='+userID+'&recipe='+recipeID+'">Link</a>\
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent delete-btn">Delete</button>\
+            </td></tr>');
+            dialog.close();
+            $('.delete-btn').click(function() {
+              deleteElement(this);
+            });
+            $('.qr-btn').click(function() {
+              qrcode.makeCode($(this).next('a').attr('href'));
+              qrDialog.showModal();
+            });
+        });
+
+
+      });
+
+      $('.delete-btn').click(function() {
+        deleteElement(this);
+      });
+
+      $('#cancel-dialog').click(function() {
+        addDialog.close();
+      });
+
+      $('#qr-cancel-dialog').click(function() {
+        qrDialog.close();
+      });
+
+      function deleteElement(element){
+        id = $(element).parent().parent().attr('id');
+
+        $.post('/shoppers/remove/'+id, function(data){
+          $(element).parent().parent().remove();
+        });
+      }
+    </script>
   </body>
 </html>

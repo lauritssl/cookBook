@@ -11,10 +11,6 @@ var recipes = db.collection("recipes");
 var users = db.collection("users");
 var shoppers = db.collection("shoppers");
 
-server.get('/qrreader/', function(req, res, next){
-        readFile('qrreader.html',res);
-});
-
 server.get('/recipes/', function (req , res, next){
   recipes.find({}, function(err, doc) {
     console.log(doc);
@@ -75,7 +71,7 @@ server.get('/shoppers/:id', function (req , res, next){
         });
 });
 
-server.get('/shoppers/remove/:id', function (req , res, next){
+server.post('/shoppers/remove/:id', function (req , res, next){
   shoppers.remove({
       _id: mongojs.ObjectId(req.params.id)
     }, function(err, doc) {
@@ -87,7 +83,7 @@ server.get('/shoppers/remove/:id', function (req , res, next){
         });
 });
 
-server.get('/shoppers/:userid/:recipeid', function (req , res, next){
+server.post('/shoppers/:userid/:recipeid', function (req , res, next){
   userid = req.params.userid;
   recipeid = req.params.recipeid;
 
@@ -95,7 +91,6 @@ server.get('/shoppers/:userid/:recipeid', function (req , res, next){
       user: userid,
       recipe: recipeid,
     }, function(err, doc) {
-        console.log(doc);
         if(doc == null){
           shoppers.insert({user: userid, recipe: recipeid}, function(err, doc) {
             console.log(doc);
@@ -103,7 +98,6 @@ server.get('/shoppers/:userid/:recipeid', function (req , res, next){
             res.end();
           });
         }
-        res.end();
   });
 });
 
