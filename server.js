@@ -1,5 +1,6 @@
 var restify = require('restify');
 var mongojs = require('mongojs');
+var fs = require('fs');
 
 port = 8080;
 
@@ -9,6 +10,10 @@ var db = mongojs('cookBook');
 var recipes = db.collection("recipes");
 var users = db.collection("users");
 var shoppers = db.collection("shoppers");
+
+server.get('/qrreader/', function(req, res, next){
+        readFile('qrreader.html',res);
+});
 
 server.get('/recipes/', function (req , res, next){
   recipes.find({}, function(err, doc) {
@@ -115,3 +120,16 @@ server.get('/.*/', restify.serveStatic({
 server.listen(port, function (){
   console.log('%s listening at %s', server.name, port)
 });
+
+
+function readFile(name, res){
+  console.log(name);
+  fs.readFile(name, function (err, html) {
+    if (err) {
+        throw err;
+    }
+    res.writeHeader(200, {"Content-Type": "text/html"});
+    res.write(html);
+    res.end();
+  });
+}
