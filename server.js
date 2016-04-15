@@ -1,15 +1,21 @@
 var restify = require('restify');
 var mongojs = require('mongojs');
-var fs = require('fs');
+var socketio = require('socket.io');
 
 port = 8080;
 
 var server = restify.createServer();
+var io = socketio.listen(server.server);
 
 var db = mongojs('cookBook');
 var recipes = db.collection("recipes");
 var users = db.collection("users");
 var shoppers = db.collection("shoppers");
+
+io.sockets.on('connection', function (socket) {
+    console.log('New recipe board is up..');
+});
+
 
 server.get('/recipes/', function (req , res, next){
   recipes.find({}, function(err, doc) {
@@ -77,6 +83,7 @@ server.post('/shoppers/remove/:id', function (req , res, next){
     }, function(err, doc) {
         if(doc){
           console.log(doc);
+          io.emit('recipeRemove', doc);
           res.send(200, doc);
           res.end();
           }
@@ -94,15 +101,13 @@ server.post('/shoppers/:userid/:recipeid', function (req , res, next){
         if(doc == null){
           shoppers.insert({user: userid, recipe: recipeid}, function(err, doc) {
             console.log(doc);
+            io.emit('recipe', doc);
             res.send(200, doc);
             res.end();
           });
         }
   });
 });
-
-
-
 
 
 
@@ -114,16 +119,3 @@ server.get('/.*/', restify.serveStatic({
 server.listen(port, function (){
   console.log('%s listening at %s', server.name, port)
 });
-
-
-function readFile(name, res){
-  console.log(name);
-  fs.readFile(name, function (err, html) {
-    if (err) {
-        throw err;
-    }
-    res.writeHeader(200, {"Content-Type": "text/html"});
-    res.write(html);
-    res.end();
-  });
-}
