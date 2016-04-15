@@ -9,22 +9,42 @@
 		<link rel="stylesheet" href="mdl/material.css">
     <link rel="stylesheet" href="style.css">
     <script src="mdl/material.min.js"></script>
+		<script src="functions.js"></script>
+		<script src="jquery.min.js"></script>
 	</head>
 	<body>
 
 		<div class="demo-card-wide mdl-card">
-		  <div class="mdl-card__title mdl-shadow--2dp" style="background: url('/assets/kyllingekrebinettemedgroent.jpg') center / cover;">
-		    <h2 class="mdl-card__title-text">Kyllingekrebinetter</h2>
+		  <div id="recipeimage" class="mdl-card__title mdl-shadow--2dp" >
+		    <h2 class="mdl-card__title-text" id="recipename"></h2>
 		  </div>
 		  <div class="mdl-card__supporting-text">
 		  </div>
 
 		</div>
 		<div class="person-image">
-			<img src="/assets/laurits.jpg" alt="" id="person" class="mdl-shadow--3dp"/>
-			<h2>Laurits<br/>Langberg</h2>
+			<img alt="" id="person" class="mdl-shadow--3dp"/>
+			<h2 id="username"></h2>
 		</div>
 
-
 	</body>
+	<script type="text/javascript">
+
+
+	var userid = getUrlVars()["user"];
+	var recipeid = getUrlVars()["recipe"];
+
+	$.get( "users/"+userid, function( data ) {
+		name = data.name;
+		name = name.replace(" ","<br/>")
+		$('#username').html(name);
+		$('#person').attr("src", data.image);
+	});
+	$.get( "recipes/"+recipeid, function( data ) {
+		$('#recipename').html(data.name);
+		$('#recipeimage').css("background", "url('"+data.image+"') center / cover;");
+
+	});
+
+	</script>
 </html>
