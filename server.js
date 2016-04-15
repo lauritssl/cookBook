@@ -83,7 +83,7 @@ server.post('/shoppers/remove/:id', function (req , res, next){
     }, function(err, doc) {
         if(doc){
           console.log(doc);
-          io.emit('recipeRemove', doc);
+          io.emit('recipeRemove', req.params.id);
           res.send(200, doc);
           res.end();
           }

@@ -31,19 +31,23 @@
 	<script type="text/javascript">
 
 
-	var userid = getUrlVars()["user"];
-	var recipeid = getUrlVars()["recipe"];
+	var shopper = getUrlVars()["shopper"];
 
-	$.get( "users/"+userid, function( data ) {
-		name = data.name;
-		name = name.replace(" ","<br/>")
-		$('#username').html(name);
-		$('#person').attr("src", data.image);
-	});
-	$.get( "recipes/"+recipeid, function( data ) {
-		$('#recipename').html(data.name);
-		$('#recipeimage').attr("style", "background: url('"+data.image+"') center / cover;");
+	$.get( "shoppers/"+shopper, function( data ) {
+		userid = data.user;
+		recipeid = data.recipe;
+		
+		$.get( "users/"+userid, function( data ) {
+			name = data.name;
+			name = name.replace(" ","<br/>")
+			$('#username').html(name);
+			$('#person').attr("src", data.image);
+		});
+		$.get( "recipes/"+recipeid, function( data ) {
+			$('#recipename').html(data.name);
+			$('#recipeimage').attr("style", "background: url('"+data.image+"') center / cover;");
 
+		});
 	});
 
 	</script>

@@ -88,18 +88,46 @@ a{
 
 li{
   text-transform: capitalize;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.demo-card-square .mdl-card__title-text{
+ul{
+  margin-top: 0;
+}
+
+.board-card .mdl-card__title-text{
   position: relative;
 }
 
-.demo-card-square.mdl-card {
-  width: 320px;
-  height: 320px;
+.board-card .mdl-card__supporting-text{
+  text-align: center;
 }
+
+.board-card .mdl-card__supporting-text img{
+  display: inline-block !important;
+}
+
 .demo-card-square > .mdl-card__title {
   color: #fff;
-  background:
-    url('../assets/demos/dog.png') bottom right 15% no-repeat #46B6AC;
+}
+
+.board-card{
+  display: inline-block;
+  margin: 10px;
+  width: 600px !important;
+}
+
+.board-card .qr{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 99;
+  padding: 10px;
+  background: #fff;
+  border-radius: 5px 5px 0px 5px;
+  box-shadow: 0px 0px 2px #888888;
+}
+
+.mdl-card__title-text{
+  text-transform: capitalize;
 }
